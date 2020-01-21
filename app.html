@@ -1,0 +1,133 @@
+<html>
+  <head>
+    <link rel="manifest" href="manifest.json" />
+    <link
+      rel="icon"
+      sizes="192x192"
+      href="/images/touch/android-launchericon-192-192.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="/images/touch/android-launchericon-192-192.png"
+    />
+    <style>
+      .container {
+        width: 550px;
+        background: #0d47a1;
+        padding: 40px 60px;
+        height: 100%;
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .container > div {
+        padding: 15px;
+      }
+
+      input {
+        padding: 5% 5%;
+        border: 10px solid #1565c0;
+        border-radius: 15px;
+        width: 400px;
+        font-size: 1.1em;
+        color: #37474f;
+        box-shadow: 0 0 4px 1px #0d47a1a6;
+      }
+
+      button#submit {
+        border: 10px solid #1565c0;
+        border-radius: 15px;
+        padding: 3% 4%;
+        width: 150px;
+        font-size: 1.1em;
+        color: #37474f;
+        cursor: pointer;
+        box-shadow: 0 0 4px 1px #0d47a1a6;
+      }
+
+      div#output {
+        display: inline-block;
+        border: 10px solid #1565c0;
+        border-radius: 15px;
+        padding: 3% 4%;
+        width: 350px;
+        min-height: 200px;
+        font-size: 1.1em;
+        color: #37474f;
+        background: white;
+        box-shadow: 0 0 4px 1px #0d47a1a6;
+      }
+    </style>
+    <script src="/scripts/pwacompat.min.js" async></script>
+  </head>
+
+  <body>
+    <div class="container">
+      <div>
+        <input
+          type="text"
+          id="filler"
+          placeholder="Lettre ou symbols a ajouter!"
+          value=""
+        />
+      </div>
+      <div>
+        <input type="text" id="target" placeholder="lien a modifier" value="" />
+      </div>
+      <div>
+        <button id="submit">Modifier</button>
+      </div>
+      <div>
+        <div id="output"></div>
+      </div>
+    </div>
+    <script>
+      function editLink(link, symbol, output) {
+        try {
+          // check if link is valid
+          var url = new URL(link);
+          var vidParam = url.searchParams.get("vid");
+          if (vidParam === null || vidParam === undefined) {
+            throw "URL doesn't contain a 'vid' param!";
+          }
+
+          // parse vidParam and add symboll after each letter
+          var newUrl = url.href.slice(0, url.href.indexOf("=")) + "=";
+          for (var i = 0; i < vidParam.length; i++) {
+            newUrl += vidParam[i] + symbol;
+          }
+
+          // set output
+          output.innerHTML = newUrl;
+        } catch (error) {
+          console.log(error);
+          alert(error);
+        }
+      }
+
+      document.getElementById("submit").addEventListener("click", function() {
+        var filler = document.getElementById("filler").value;
+        var target = document.getElementById("target").value;
+        var output = document.getElementById("output");
+        editLink(target, filler, output);
+      });
+    </script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("/sw.js", { scope: "/" })
+          .then(function(registration) {
+            console.log("Service Worker Registered");
+          });
+
+        navigator.serviceWorker.ready.then(function(registration) {
+          console.log("Service Worker Ready");
+        });
+      }
+    </script>
+  </body>
+</html>
